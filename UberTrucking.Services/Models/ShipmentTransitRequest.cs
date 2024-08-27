@@ -8,11 +8,12 @@ namespace UberTrucking.Services.Models
 {
     public class ShipmentTransitRequest
     {
-        public string PickupAddress { get; set; }
-        public decimal PickupLatitude { get; set; }
-        public decimal PickupLongitude { get; set; }
-        public string DeliveryAddress { get; set; }
-        public decimal DeliveryLatitude { get; set; }
+        public required string PickupAddress { get; set; }
+        public required decimal PickupLatitude { get; set; }
+        public required decimal PickupLongitude { get; set; }
+        public required string DeliveryAddress { get; set; }
+        public required decimal DeliveryLatitude { get; set; }
         public decimal DeliveryLongitude { get; set; }
+        public required string AddressData { get; set; }
     }
 }
