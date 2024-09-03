@@ -10,6 +10,8 @@ namespace UberTrucking.Services.Models
     public class UserResponse
     {
         public User User { get; set; }
+
+        public string Message { get; set; }
         public string ErrorMessage { get; set; }
     }
 }

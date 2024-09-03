@@ -10,8 +10,10 @@ namespace UberTrucking.Services.Services.Interfaces
 {
     public interface IUserService
     {
-        Task CreateUserAsync(UserRequest request);
+        Task<UserResponse> CreateUserAsync(UserRequest request);
 
-        Task<UserResponse> GetUserByEmailAsync(LoginRequest request);
+        Task<UserResponse> LoginAsync(LoginRequest request);
+
+        Task<UserResponse> SendResetLinkAsync(string email);
     }
 }

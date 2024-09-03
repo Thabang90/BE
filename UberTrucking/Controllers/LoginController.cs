@@ -20,7 +20,7 @@ namespace UberTrucking.Controllers
         {
             try
             {
-                var result = await this.userService.GetUserByEmailAsync(request);
+                var result = await this.userService.LoginAsync(request);
                 if (result.User != null)
                 {
                     return Ok(new
@@ -38,6 +38,26 @@ namespace UberTrucking.Controllers
             {
                 return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
             }
+        }
+
+        [HttpPost("send-reset-email/{email}")]
+        public async Task<IActionResult> SendResetPasswordEmailAsync(string email)
+        {
+            try
+            {
+                var results = await this.userService.SendResetLinkAsync(email);
+                if (string.IsNullOrEmpty(results.Message))
+                {
+                    return BadRequest(results.ErrorMessage);
+                }
+
+                return Ok(results.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
+            }
+
         }
     }
 }

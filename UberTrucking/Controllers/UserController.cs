@@ -20,12 +20,17 @@ namespace UberTrucking.Controllers
         {
             try
             {
-                await userService.CreateUserAsync(request);
-                return Ok(new { Message = "User successfully created!"});
+                var results = await userService.CreateUserAsync(request);
+                if(string.IsNullOrEmpty(results.Message))
+                {
+                    return BadRequest(results.ErrorMessage);
+                }
+
+                return Ok(results.Message);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
             }
         }
     }
