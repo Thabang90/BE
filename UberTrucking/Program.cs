@@ -10,6 +10,7 @@ using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//for testing realtime with signal R
 //builder.WebHost.ConfigureKestrel(serverOptions =>
 //{
 //    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
