@@ -14,6 +14,7 @@ namespace UberTrucking.Infrastructure.Entities
         public decimal PickupLongitude { get; set; }
         public string DeliveryAddress { get; set; }
         public decimal DeliveryLatitude { get; set; }
-        public decimal DeliveryLongitude { get;set; }
+        public decimal DeliveryLongitude { get; set; }
+        public string? AddressData { get; set; }
     }
 }

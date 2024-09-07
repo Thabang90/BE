@@ -14,6 +14,6 @@ namespace UberTrucking.Services.Models
         public required string DeliveryAddress { get; set; }
         public required decimal DeliveryLatitude { get; set; }
         public decimal DeliveryLongitude { get; set; }
-        public required string AddressData { get; set; }
+        public string AddressData { get; set; }
     }
 }
