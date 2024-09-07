@@ -29,5 +29,11 @@ namespace UberTrucking.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("costs/{id}")]
+        public IActionResult GetShipmentCosts(int id)
+        {
+            return Ok(new { Price = 45, Distance = 20 });
+        }
     }
 }

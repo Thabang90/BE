@@ -47,6 +47,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShipmentTransitRepository, ShipmentTransitRepository>();
 builder.Services.AddScoped<IShipmentTransitService, ShipmentTransitService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IDriverDetailRepository, DriverDetailRepository>();
+builder.Services.AddScoped<IDriverDetailService, DriverDetailService>();
 
 var app = builder.Build();
 
