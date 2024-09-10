@@ -15,7 +15,6 @@ namespace UberTrucking.Controllers
         }
 
         [HttpGet("drivers/{id}")]
-
         public async Task<IActionResult> GetDriverDetailsAsync(int id)
         {
             try

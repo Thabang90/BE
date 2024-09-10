@@ -15,7 +15,7 @@ namespace UberTrucking.Infrastructure.Repositories
         private readonly IDapperSqlHelper dapperSqlHelper;
 
         #region Queries
-        private readonly string createShipmentQuery = "insert into shipment_transits values (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data)";
+        private readonly string createShipmentQuery = "insert into shipment_transits values (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
         #endregion
 
         public ShipmentTransitRepository(IDapperSqlHelper dapperSqlHelper)
@@ -35,6 +35,12 @@ namespace UberTrucking.Infrastructure.Repositories
                 parameters.Add("@delivery_latitude", shipmentTransit.DeliveryLatitude);
                 parameters.Add("@delivery_longitude", shipmentTransit.DeliveryLongitude);
                 parameters.Add("@address_data", shipmentTransit.AddressData);
+                parameters.Add("@user_id", shipmentTransit.UserId);
+                parameters.Add("@height", shipmentTransit.Height);
+                parameters.Add("@width", shipmentTransit.Width);
+                parameters.Add("@length", shipmentTransit.Length);
+                parameters.Add("@description", shipmentTransit.Description);
+                //@, @, @, @
 
                 var result = await this.dapperSqlHelper.ExecuteAsync(createShipmentQuery, parameters); 
             }
