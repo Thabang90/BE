@@ -31,6 +31,9 @@ namespace UberTrucking.Services.Services
                 DeliveryLongitude = request.DeliveryLongitude,
                 AddressData = request.AddressData,
                 UserId = request.UserId,
+                Height = request.Height,
+                Width = request.Width,
+                Length = request.Length,
             };
 
             await this.shipmentTransitRepository.CreateShimentTransitAsync(shipmentTransit);
