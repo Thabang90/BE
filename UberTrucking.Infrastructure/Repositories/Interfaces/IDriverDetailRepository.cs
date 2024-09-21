@@ -10,5 +10,10 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
     public interface IDriverDetailRepository
     {
         Task<DriverDetail> GetDriverDetailsAsync(int driverId);
+        Task CreateDriverDetailAsync(DriverDetail driverDetail);
+
+        Task UpdateDriverStatusAsync(int driverId, bool isAvailable);
+
+        Task<List<DriverDetail>> GetAvailableDriversAsync();
     }
 }

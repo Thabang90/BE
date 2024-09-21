@@ -33,10 +33,29 @@ namespace UberTrucking.Services.Services
                 UserId = request.UserId,
                 Height = request.Height,
                 Width = request.Width,
-                Length = request.Length,
+                Length = request.Length, 
+                Description = request.Description
             };
 
             await this.shipmentTransitRepository.CreateShimentTransitAsync(shipmentTransit);
+        }
+
+        public async Task CreateShipmentTransactionAsync(ShipmentTransactionRequest shipmentTransactionRequest)
+        {
+            var shipmentTransaction = new ShipmentTransaction()
+            {
+                ShipmentId = shipmentTransactionRequest.ShipmentId,
+                Price = shipmentTransactionRequest.Price,
+                Distance = shipmentTransactionRequest.Distance,
+                PaymentMethod = shipmentTransactionRequest.PaymentMethod,
+            };
+
+            await this.shipmentTransitRepository.CreateShipmentTransactionAsync(shipmentTransaction); 
+        }
+
+        public async Task UpdateShipmentDriverAsync(UpdateShipmentDriverRequest request)
+        {
+            await this.shipmentTransitRepository.UpdateShipmentDriverAsync(request.ShipmentId, request.ShipmentId);
         }
     }
 }

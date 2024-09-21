@@ -11,6 +11,8 @@ namespace UberTrucking.Services.Services.Interfaces
 {
     public interface IDriverDetailService
     {
+        Task<DriverDetailResponse> CreateDriverDetailAsync(DriverDetailRequest driverDetailRequest);
         Task<DriverDetailResponse> GetDriverDetailsById(int driverId);
+        Task<DriverDetailResponse> GetAvailableDriversAsync();
     }
 }

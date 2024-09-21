@@ -32,9 +32,9 @@ namespace UberTrucking.Infrastructure.Repositories
                 parameters.Add("@name", user.Name);
                 parameters.Add("@surname", user.Surname);
                 parameters.Add("@email", user.Email);
-                parameters.Add("@phone_number", user.PhoneNumber);
+                parameters.Add("@phone_number", user.Phone_Number);
                 parameters.Add("@password", user.Password);
-                parameters.Add("@role_id", user.RoleId);
+                parameters.Add("@role_id", user.Role_Id);
 
                 var result = await this.dapperSqlHelper.ExecuteAsync(createUserQuery, parameters);
             }

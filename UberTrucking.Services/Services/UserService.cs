@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using UberTrucking.Infrastructure.Entities;
 using UberTrucking.Infrastructure.Repositories.Interfaces;
+using UberTrucking.Services.Enums;
 using UberTrucking.Services.Helpers;
 using UberTrucking.Services.Models;
 using UberTrucking.Services.Services.Interfaces;
@@ -12,12 +13,14 @@ namespace UberTrucking.Services.Services
         private readonly IUserRepository userRepository;
         private readonly IConfiguration config;
         private readonly IEmailService emailService;
+        private readonly IDriverDetailRepository driverDetailRepository;
 
-        public UserService(IUserRepository userRepository, IConfiguration config, IEmailService emailService)
+        public UserService(IUserRepository userRepository, IConfiguration config, IEmailService emailService, IDriverDetailRepository driverDetailRepository)
         {
             this.userRepository = userRepository;
             this.config = config;
             this.emailService = emailService;
+            this.driverDetailRepository = driverDetailRepository;
         }
 
         public async Task<UserResponse> CreateUserAsync(UserRequest request)
@@ -36,8 +39,8 @@ namespace UberTrucking.Services.Services
                     Surname = request.Surname,
                     Email = request.Email,
                     Password = PasswordHasher.HashPassword(request.Password),
-                    PhoneNumber = request.PhoneNumber,
-                    RoleId = request.RoleId
+                    Phone_Number = request.PhoneNumber,
+                    Role_Id = request.RoleId
                 };
 
                 await this.userRepository.CreateUserAsync(user);
@@ -57,6 +60,12 @@ namespace UberTrucking.Services.Services
                 {
                     ErrorMessage = "Invalid username or password"
                 };
+            }
+
+            if(user.Role_Id == (int)UserRole.Driver)
+            {
+                bool isDriverAvailable = true;
+                await this.driverDetailRepository.UpdateDriverStatusAsync(user.Id, isDriverAvailable);
             }
 
             return new UserResponse

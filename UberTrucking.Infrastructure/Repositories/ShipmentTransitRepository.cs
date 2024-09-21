@@ -15,7 +15,17 @@ namespace UberTrucking.Infrastructure.Repositories
         private readonly IDapperSqlHelper dapperSqlHelper;
 
         #region Queries
-        private readonly string createShipmentQuery = "insert into shipment_transits values (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
+        private readonly string createShipmentQuery = 
+                @"INSERT INTO shipment_transits VALUES (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
+
+        private readonly string createTransactionQuery =
+                @"INSERT INTO shipment_transactions VALUES (@shipment_id, @price, @distance, @payment_method)";
+
+        private readonly string updateShipmentDriverId =
+                @"Update shipment_transits
+                  SET driver_id = @driver_id
+                  WHERE id = @id";
+
         #endregion
 
         public ShipmentTransitRepository(IDapperSqlHelper dapperSqlHelper)
@@ -40,7 +50,6 @@ namespace UberTrucking.Infrastructure.Repositories
                 parameters.Add("@width", shipmentTransit.Width);
                 parameters.Add("@length", shipmentTransit.Length);
                 parameters.Add("@description", shipmentTransit.Description);
-                //@, @, @, @
 
                 var result = await this.dapperSqlHelper.ExecuteAsync(createShipmentQuery, parameters); 
             }
@@ -48,6 +57,41 @@ namespace UberTrucking.Infrastructure.Repositories
             {
                 throw new Exception(ex.ToString());
             }
+        }
+
+        public async Task CreateShipmentTransactionAsync(ShipmentTransaction shipmentTransaction)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@shipment_id", shipmentTransaction.ShipmentId);
+                parameters.Add("@price", shipmentTransaction.Price);
+                parameters.Add("@distance", shipmentTransaction.Distance);
+                parameters.Add("@payment_method", shipmentTransaction.PaymentMethod);
+
+                var result = await this.dapperSqlHelper.ExecuteAsync(this.createTransactionQuery, parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        public async Task UpdateShipmentDriverAsync(int shipmentId, int driver_id)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@id", shipmentId);
+                parameters.Add("@driver_id", driver_id);
+
+                var result = await this.dapperSqlHelper.ExecuteAsync(this.updateShipmentDriverId, parameters);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+
 
         }
     }

@@ -10,5 +10,7 @@ namespace UberTrucking.Services.Services.Interfaces
     public interface IShipmentTransitService
     {
         Task CreateShipmentTransitAsync(ShipmentTransitRequest request);
+        Task CreateShipmentTransactionAsync(ShipmentTransactionRequest shipmentTransactionRequest);
+        Task UpdateShipmentDriverAsync(UpdateShipmentDriverRequest request);
     }
 }

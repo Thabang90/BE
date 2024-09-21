@@ -10,6 +10,7 @@ namespace UberTrucking.Services.Models
     public class DriverDetailResponse
     {
         public DriverDetail DriverDetail { get; set; }
+        public List<DriverDetail> DriverDetails { get; set; }
         public string Message { get; set; }
         public string ErrorMessage { get; set; }
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using UberTrucking.Services.Models;
 using UberTrucking.Services.Services;
 using UberTrucking.Services.Services.Interfaces;
@@ -23,6 +24,34 @@ namespace UberTrucking.Controllers
             {
                 await shipmentTransitService.CreateShipmentTransitAsync(request);
                 return Ok(new { Message = "Shipment successfully created!" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("create-transaction")]
+        public async Task<IActionResult> CreateShipmentTransactionAsync([FromBody] ShipmentTransactionRequest request)
+        {
+            try
+            {
+                await this.shipmentTransitService.CreateShipmentTransactionAsync(request);
+                return Ok(new { Message = "Transaction successfully completed"});
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("update-shipment-driver")]
+        public async Task<IActionResult> UpdateShipmentTransitDriverAsync([FromBody] UpdateShipmentDriverRequest request)
+        {
+            try
+            {
+                await this.shipmentTransitService.UpdateShipmentDriverAsync(request);
+                return Ok(new { Message = "Driver Assigned to Shipment" });
             }
             catch (Exception ex)
             {
