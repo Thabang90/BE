@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using UberTrucking.Infrastructure.Data.Interfaces;
@@ -16,10 +17,30 @@ namespace UberTrucking.Infrastructure.Repositories
 
         #region Queries
         private readonly string createShipmentQuery =
-                @"INSERT INTO shipment_transits (pickup_address,pickup_latitude,pickup_longitude, delivery_address, delivery_latitude, delivery_longitude,address_data, user_id, height, width, length, description)
-                  VALUES 
-                  (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
-
+                @"
+                INSERT INTO shipment_transits (
+                    pickup_address, pickup_latitude, pickup_longitude, 
+                    delivery_address, delivery_latitude, delivery_longitude, 
+                    address_data, user_id, height, width, length, description
+                )
+                OUTPUT 
+                    INSERTED.pickup_address AS PickupAddress,
+                    INSERTED.pickup_latitude AS PickupLatitude,
+                    INSERTED.pickup_longitude AS PickupLongitude,
+                    INSERTED.delivery_address AS DeliveryAddress,
+                    INSERTED.delivery_latitude AS DeliveryLatitude,
+                    INSERTED.delivery_longitude AS DeliveryLongitude,
+                    INSERTED.address_data AS AddressData,
+                    INSERTED.user_id AS UserId,
+                    INSERTED.height AS Height,
+                    INSERTED.width AS Width,
+                    INSERTED.length AS Length,
+                    INSERTED.description AS Description
+                VALUES 
+                    (@pickup_address, @pickup_latitude, @pickup_longitude, 
+                    @delivery_address, @delivery_latitude, @delivery_longitude, 
+                    @address_data, @user_id, @height, @width, @length, @description);
+                ";
 
         private readonly string createTransactionQuery =
                 @"INSERT INTO shipment_transactions VALUES (@shipment_id, @price, @distance, @payment_method)";
@@ -29,6 +50,12 @@ namespace UberTrucking.Infrastructure.Repositories
                   SET driver_id = @driver_id
                   WHERE id = @id";
 
+        private readonly string getAvailableShipmentsQuery=
+            @"SELECT 
+                pickup_address AS PickupAddress ,pickup_latitude AS PickupLatitude, pickup_longitude AS PickupLongitude, delivery_address AS DeliveryAddress, delivery_latitude AS DeliveryLatitude, delivery_longitude AS DeliveryLongitude,address_data AS AddressData, user_id AS UserId, height AS Height, width AS Width, length AS Length, description AS Description
+              FROM shipment_transits
+              WHERE driver_id IS NULL";
+              
         #endregion
 
         public ShipmentTransitRepository(IDapperSqlHelper dapperSqlHelper)
@@ -36,7 +63,7 @@ namespace UberTrucking.Infrastructure.Repositories
             this.dapperSqlHelper = dapperSqlHelper;
         }
 
-        public async Task CreateShimentTransitAsync(ShipmentTransit shipmentTransit)
+        public async Task<ShipmentTransit> CreateShimentTransitAsync(ShipmentTransit shipmentTransit)
         {
             try
             {
@@ -54,7 +81,8 @@ namespace UberTrucking.Infrastructure.Repositories
                 parameters.Add("@length", shipmentTransit.Length);
                 parameters.Add("@description", shipmentTransit.Description);
 
-                var result = await this.dapperSqlHelper.ExecuteAsync(createShipmentQuery, parameters); 
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<ShipmentTransit>(createShipmentQuery, parameters);
+                return result;
             }
             catch (Exception ex)
             {
@@ -94,8 +122,12 @@ namespace UberTrucking.Infrastructure.Repositories
             {
                 throw new Exception(ex.ToString());
             }
+        }
 
-
+        public async Task<IEnumerable<ShipmentTransit>> GetAvailableShipmentsAsync()
+        {
+            var result = await this.dapperSqlHelper.QueryAsync<ShipmentTransit>(this.getAvailableShipmentsQuery);
+            return result;
         }
     }
 }

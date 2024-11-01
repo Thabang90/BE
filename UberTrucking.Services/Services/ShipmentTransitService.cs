@@ -19,8 +19,9 @@ namespace UberTrucking.Services.Services
             this.shipmentTransitRepository = shipmentTransitRepository;
         }
 
-        public async Task CreateShipmentTransitAsync(ShipmentTransitRequest request)
+        public async Task<ShipmentTransitResponse> CreateShipmentTransitAsync(ShipmentTransitRequest request)
         {
+            var response = new ShipmentTransitResponse();
             var shipmentTransit = new ShipmentTransit()
             {
                 PickupAddress = request.PickupAddress,
@@ -37,7 +38,8 @@ namespace UberTrucking.Services.Services
                 Description = request.Description
             };
 
-            await this.shipmentTransitRepository.CreateShimentTransitAsync(shipmentTransit);
+           response.ShipmentTransit = await this.shipmentTransitRepository.CreateShimentTransitAsync(shipmentTransit);
+           return response;
         }
 
         public async Task CreateShipmentTransactionAsync(ShipmentTransactionRequest shipmentTransactionRequest)
@@ -56,6 +58,21 @@ namespace UberTrucking.Services.Services
         public async Task UpdateShipmentDriverAsync(UpdateShipmentDriverRequest request)
         {
             await this.shipmentTransitRepository.UpdateShipmentDriverAsync(request.ShipmentId, request.ShipmentId);
+        }
+
+        public async Task<ShipmentTransitResponse> GetAvailableShipmentsAsync()
+        {
+            var response = new ShipmentTransitResponse();
+            var results = await this.shipmentTransitRepository.GetAvailableShipmentsAsync();
+            if(results.Any())
+            {
+                response.ShipmentTransits = results;
+            }
+            else
+            {
+                response.ErrorMessage = "No Shipments available at the moment!";
+            }
+            return response;
         }
     }
 }

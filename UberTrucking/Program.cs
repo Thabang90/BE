@@ -11,14 +11,14 @@ using System.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 //for testing realtime with signal R
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Listen(IPAddress.Any, 5000);
-    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
-});
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.Listen(IPAddress.Any, 5000);
+//    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
+//    {
+//        listenOptions.UseHttps();
+//    });
+//});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -53,12 +53,12 @@ builder.Services.AddScoped<IDriverDetailService, DriverDetailService>();
 
 var app = builder.Build();
 
-app.UseCors(builder => builder
-    .WithOrigins("http://localhost:4200/")
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials()
-    );
+//app.UseCors(builder => builder
+//    .WithOrigins("http://localhost:4200/")
+//    .AllowAnyHeader()
+//    .AllowAnyMethod()
+//    .AllowCredentials()
+//    );
 
 
 

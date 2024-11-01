@@ -9,8 +9,10 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
 {
     public interface IShipmentTransitRepository
     {
-        Task CreateShimentTransitAsync(ShipmentTransit shipmentTransit);
+        Task<ShipmentTransit> CreateShimentTransitAsync(ShipmentTransit shipmentTransit);
         Task CreateShipmentTransactionAsync(ShipmentTransaction shipmentTransaction);
         Task UpdateShipmentDriverAsync(int shipmentId, int driver_id);
+
+        Task<IEnumerable<ShipmentTransit>> GetAvailableShipmentsAsync();
     }
 }

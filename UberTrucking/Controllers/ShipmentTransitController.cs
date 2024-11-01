@@ -22,8 +22,13 @@ namespace UberTrucking.Controllers
         {
             try
             {
-                await shipmentTransitService.CreateShipmentTransitAsync(request);
-                return Ok(new { Message = "Shipment successfully created!" });
+                var results = await shipmentTransitService.CreateShipmentTransitAsync(request);
+                if(results == null)
+                {
+                    return BadRequest("The shipment was not created. Please try again");
+                }
+
+                return Ok(results);
             }
             catch (Exception ex)
             {
@@ -56,6 +61,25 @@ namespace UberTrucking.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("available-shipments")]
+        public async Task<IActionResult> GetAllAvailableShipmentTransitsAsync()
+        {
+            try
+            {
+                var results = await this.shipmentTransitService.GetAvailableShipmentsAsync();
+                if(!string.IsNullOrEmpty(results.ErrorMessage))
+                {
+                    return BadRequest(results.ErrorMessage);
+                }
+
+                return Ok(results);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
             }
         }
 
