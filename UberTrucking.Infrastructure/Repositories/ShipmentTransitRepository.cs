@@ -15,8 +15,11 @@ namespace UberTrucking.Infrastructure.Repositories
         private readonly IDapperSqlHelper dapperSqlHelper;
 
         #region Queries
-        private readonly string createShipmentQuery = 
-                @"INSERT INTO shipment_transits VALUES (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
+        private readonly string createShipmentQuery =
+                @"INSERT INTO shipment_transits (pickup_address,pickup_latitude,pickup_longitude, delivery_address, delivery_latitude, delivery_longitude,address_data, user_id, height, width, length, description)
+                  VALUES 
+                  (@pickup_address, @pickup_latitude, @pickup_longitude, @delivery_address, @delivery_latitude, @delivery_longitude,@address_data, @user_id, @height, @width, @length, @description)";
+
 
         private readonly string createTransactionQuery =
                 @"INSERT INTO shipment_transactions VALUES (@shipment_id, @price, @distance, @payment_method)";

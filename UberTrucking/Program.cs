@@ -53,11 +53,14 @@ builder.Services.AddScoped<IDriverDetailService, DriverDetailService>();
 
 var app = builder.Build();
 
-//app.UseCors(builder => builder
-//    .AllowAnyHeader()
-//    .AllowAnyMethod()
-//    .AllowCredentials()
-//    .WithOrigins("http://localhost:7267/"));
+app.UseCors(builder => builder
+    .WithOrigins("http://localhost:4200/")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    );
+
+
 
 // Add SignalR endpoint
 app.UseCors("AllowAll");
