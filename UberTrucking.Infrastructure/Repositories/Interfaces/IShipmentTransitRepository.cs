@@ -12,7 +12,8 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
         Task<ShipmentTransit> CreateShimentTransitAsync(ShipmentTransit shipmentTransit);
         Task CreateShipmentTransactionAsync(ShipmentTransaction shipmentTransaction);
         Task UpdateShipmentDriverAsync(int shipmentId, int driver_id);
-
         Task<IEnumerable<ShipmentTransit>> GetAvailableShipmentsAsync();
+        Task<bool> ShipmentHasDriverAsync(int shipmentId);
+        Task<ShipmentTransaction> UpdateShipmentTransactionUserAcceptanceCostAsync(int shipmentId);
     }
 }

@@ -74,5 +74,24 @@ namespace UberTrucking.Services.Services
             }
             return response;
         }
+
+        public async Task<bool> ShipmentHasDriverAsync(int shipmentId)
+        {
+            var result = await this.shipmentTransitRepository.ShipmentHasDriverAsync(shipmentId);
+            return result;
+        }
+
+        public async Task<ShipmentTransactionResponse> UpdateShipmentTransactionUserAcceptanceCostAsync(int shipmentId)
+        {
+            var response = new ShipmentTransactionResponse();
+            var result = await this.shipmentTransitRepository.UpdateShipmentTransactionUserAcceptanceCostAsync(shipmentId);
+            if(result == null)
+            {
+                response.ErrorMessage = "No shipment transaction was found!";
+            }
+
+            response.ShipmentTransaction = result;
+            return response;
+        }
     }
 }

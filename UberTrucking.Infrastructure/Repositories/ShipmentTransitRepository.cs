@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
@@ -43,7 +44,9 @@ namespace UberTrucking.Infrastructure.Repositories
                 ";
 
         private readonly string createTransactionQuery =
-                @"INSERT INTO shipment_transactions VALUES (@shipment_id, @price, @distance, @payment_method)";
+                @"INSERT INTO shipment_transactions (shipment_id, price, distance, payment_method)
+                  VALUES 
+                (@shipment_id, @price, @distance, @payment_method)";
 
         private readonly string updateShipmentDriverId =
                 @"Update shipment_transits
@@ -52,10 +55,29 @@ namespace UberTrucking.Infrastructure.Repositories
 
         private readonly string getAvailableShipmentsQuery=
             @"SELECT 
-                pickup_address AS PickupAddress ,pickup_latitude AS PickupLatitude, pickup_longitude AS PickupLongitude, delivery_address AS DeliveryAddress, delivery_latitude AS DeliveryLatitude, delivery_longitude AS DeliveryLongitude,address_data AS AddressData, user_id AS UserId, height AS Height, width AS Width, length AS Length, description AS Description
+                id AS Id, pickup_address AS PickupAddress ,pickup_latitude AS PickupLatitude, pickup_longitude AS PickupLongitude, delivery_address AS DeliveryAddress, delivery_latitude AS DeliveryLatitude, delivery_longitude AS DeliveryLongitude,address_data AS AddressData, user_id AS UserId, height AS Height, width AS Width, length AS Length, description AS Description
               FROM shipment_transits
               WHERE driver_id IS NULL";
-              
+
+        private readonly string verifyShipmentDriverQuery =
+            @"SELECT 
+                CASE WHEN driver_id IS NULL THEN 0
+                ELSE 1 END
+            FROM shipment_transits
+            WHERE id = @id";
+
+        private readonly string updateShipmentTransactionUserAcceptanceCost =
+            @"UPDATE shipment_transactions
+              SET user_acceptance_cost = 1
+              OUTPUT
+                INSERTED.id AS Id,
+              	INSERTED.shipment_id AS ShipmentId,
+              	INSERTED.price AS Price,
+              	INSERTED.distance AS Distance,
+              	INSERTED.payment_method AS PaymentMethod,
+              	INSERTED.user_acceptance_cost AS UserAcceptanceCost
+              WHERE shipment_id = @id";
+
         #endregion
 
         public ShipmentTransitRepository(IDapperSqlHelper dapperSqlHelper)
@@ -128,6 +150,38 @@ namespace UberTrucking.Infrastructure.Repositories
         {
             var result = await this.dapperSqlHelper.QueryAsync<ShipmentTransit>(this.getAvailableShipmentsQuery);
             return result;
+        }
+
+        public async Task<bool> ShipmentHasDriverAsync(int shipmentId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@id", shipmentId);
+
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<bool>(this.verifyShipmentDriverQuery, parameters);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        public async Task<ShipmentTransaction> UpdateShipmentTransactionUserAcceptanceCostAsync(int shipmentId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@id", shipmentId);
+
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<ShipmentTransaction>(this.updateShipmentTransactionUserAcceptanceCost, parameters);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

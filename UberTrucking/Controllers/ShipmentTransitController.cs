@@ -83,6 +83,39 @@ namespace UberTrucking.Controllers
             }
         }
 
+        [HttpGet("shipment-has-driver/{id}")]
+        public async Task<IActionResult> VerifyShipmentDriverAsync(int id)
+        {
+            try
+            {
+                var result = await this.shipmentTransitService.ShipmentHasDriverAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
+            }
+        }
+
+        [HttpGet("update-shipment-transaction-cost/{id}")]
+        public async Task<IActionResult> UpdateShipmentTransactionCostAsync(int id)
+        {
+            try
+            {
+                var result = await this.shipmentTransitService.UpdateShipmentTransactionUserAcceptanceCostAsync(id);
+                if (!string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    return BadRequest(result.ErrorMessage);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
+            }
+        }
+
+
         [HttpGet("costs/{id}")]
         public IActionResult GetShipmentCosts(int id)
         {
