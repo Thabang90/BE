@@ -13,10 +13,14 @@ namespace UberTrucking.Services.Services
     public class ShipmentTransitService : IShipmentTransitService
     {
         private readonly IShipmentTransitRepository shipmentTransitRepository;
+        private readonly IDriverDetailRepository driverDetailRepository;
 
-        public ShipmentTransitService(IShipmentTransitRepository shipmentTransitRepository)
+        public ShipmentTransitService(
+            IShipmentTransitRepository shipmentTransitRepository,
+            IDriverDetailRepository driverDetailRepository)
         {
             this.shipmentTransitRepository = shipmentTransitRepository;
+            this.driverDetailRepository = driverDetailRepository;
         }
 
         public async Task<ShipmentTransitResponse> CreateShipmentTransitAsync(ShipmentTransitRequest request)
@@ -60,9 +64,17 @@ namespace UberTrucking.Services.Services
             await this.shipmentTransitRepository.UpdateShipmentDriverAsync(request.ShipmentId, request.ShipmentId);
         }
 
-        public async Task<ShipmentTransitResponse> GetAvailableShipmentsAsync()
+        public async Task<ShipmentTransitResponse> GetAvailableShipmentsAsync(int driverId)
         {
             var response = new ShipmentTransitResponse();
+
+            var isActivated = await this.driverDetailRepository.VerifyDriverActivatedStatusAsync(driverId);
+
+            if(!isActivated)
+            {
+                response.ErrorMessage = "Driver is not yet Active!";
+            }
+
             var results = await this.shipmentTransitRepository.GetAvailableShipmentsAsync();
             if(results.Any())
             {

@@ -44,6 +44,10 @@ namespace UberTrucking.Infrastructure.Repositories
                   JOIN users u WITH(NOLOCK) ON u.id = d.driver_id
                   WHERE d.is_available = 1";
 
+        private readonly string checkDriverActivatedStatus =
+                @"SELECT activated_status FROM driver_details d WITH(NOLOCK) 
+                  WHERE d.driver_id = @driver_id";
+
         #endregion
 
         public async Task<DriverDetail> GetDriverDetailsAsync(int driverId)
@@ -103,6 +107,22 @@ namespace UberTrucking.Infrastructure.Repositories
             {
                 var result = await this.dapperSqlHelper.QueryAsync<DriverDetail>(getAvailableDrivers);
                 return result.ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        public async Task<bool> VerifyDriverActivatedStatusAsync(int driverId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@driver_id", driverId);
+
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<bool>(this.checkDriverActivatedStatus, parameters);
+                return result;
             }
             catch (Exception ex)
             {

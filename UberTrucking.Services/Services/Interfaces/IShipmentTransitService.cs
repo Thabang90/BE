@@ -13,7 +13,7 @@ namespace UberTrucking.Services.Services.Interfaces
         Task<ShipmentTransitResponse> CreateShipmentTransitAsync(ShipmentTransitRequest request);
         Task CreateShipmentTransactionAsync(ShipmentTransactionRequest shipmentTransactionRequest);
         Task UpdateShipmentDriverAsync(UpdateShipmentDriverRequest request);
-        Task<ShipmentTransitResponse> GetAvailableShipmentsAsync();
+        Task<ShipmentTransitResponse> GetAvailableShipmentsAsync(int driverId);
         Task<bool> ShipmentHasDriverAsync(int shipmentId);
         Task<ShipmentTransactionResponse> UpdateShipmentTransactionUserAcceptanceCostAsync(int shipmentId);
     }

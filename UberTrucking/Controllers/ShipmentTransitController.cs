@@ -64,12 +64,12 @@ namespace UberTrucking.Controllers
             }
         }
 
-        [HttpGet("available-shipments")]
-        public async Task<IActionResult> GetAllAvailableShipmentTransitsAsync()
+        [HttpGet("available-shipments/{driverId}")]
+        public async Task<IActionResult> GetAllAvailableShipmentTransitsAsync(int driverId)
         {
             try
             {
-                var results = await this.shipmentTransitService.GetAvailableShipmentsAsync();
+                var results = await this.shipmentTransitService.GetAvailableShipmentsAsync(driverId);
                 if(!string.IsNullOrEmpty(results.ErrorMessage))
                 {
                     return BadRequest(results.ErrorMessage);

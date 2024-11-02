@@ -15,5 +15,6 @@ namespace UberTrucking.Infrastructure.Entities
         public string VehicleMake { get; set; }
         public string VehicleModel { get; set; }
         public bool IsAvailable { get; set; }
+        public bool ActivatedStatus { get; set; }
     }
 }

@@ -15,5 +15,7 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
         Task UpdateDriverStatusAsync(int driverId, bool isAvailable);
 
         Task<List<DriverDetail>> GetAvailableDriversAsync();
+
+        Task<bool> VerifyDriverActivatedStatusAsync(int driverId);
     }
 }
