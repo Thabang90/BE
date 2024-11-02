@@ -25,6 +25,7 @@ namespace UberTrucking.Infrastructure.Repositories
                     address_data, user_id, height, width, length, description
                 )
                 OUTPUT 
+                    INSERTED.id AS Id,
                     INSERTED.pickup_address AS PickupAddress,
                     INSERTED.pickup_latitude AS PickupLatitude,
                     INSERTED.pickup_longitude AS PickupLongitude,
