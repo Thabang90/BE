@@ -51,11 +51,11 @@ namespace UberTrucking.Controllers
         }
 
         [HttpPost("update-shipment-driver")]
-        public async Task<IActionResult> UpdateShipmentTransitDriverAsync([FromBody] UpdateShipmentDriverRequest request)
+        public async Task<IActionResult> UpdateShipmentTransitDriverAsync([FromBody] ShipmentTransactionRequest request)
         {
             try
             {
-                await this.shipmentTransitService.UpdateShipmentDriverAsync(request);
+                await this.shipmentTransitService.CreateShipmentTransactionAsync(request);
                 return Ok(new { Message = "Driver Assigned to Shipment" });
             }
             catch (Exception ex)
