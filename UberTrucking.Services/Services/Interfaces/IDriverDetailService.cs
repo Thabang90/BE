@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using UberTrucking.Infrastructure.Entities;
+﻿using Microsoft.AspNetCore.Http;
 using UberTrucking.Services.Models;
 
 namespace UberTrucking.Services.Services.Interfaces
@@ -14,5 +8,7 @@ namespace UberTrucking.Services.Services.Interfaces
         Task<DriverDetailResponse> CreateDriverDetailAsync(DriverDetailRequest driverDetailRequest);
         Task<DriverDetailResponse> GetDriverDetailsById(int driverId);
         Task<DriverDetailResponse> GetAvailableDriversAsync();
+        Task<FileUploadResponse> UploadPdfDocumentAsync(IFormFile file);
+        Task<FileUploadResponse> DownloadPdfAsync(string fileName);
     }
 }

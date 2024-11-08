@@ -54,7 +54,43 @@ namespace UberTrucking.Controllers
             }
         }
 
-        [HttpGet("available-drivers")]
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadPdfDocumentAsync(IFormFile file)
+        {
+            try
+            {
+                if(file == null || file.Length == 0)
+                {
+                    return BadRequest("No file uploaded!");
+                }
+
+                var result = await this.driverDetailService.UploadPdfDocumentAsync(file);
+                if (!string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    return NotFound(result.ErrorMessage);
+                }
+                return Ok(result.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
+            }
+        }
+
+        [HttpGet("dowload/{fileName}")]
+        public async Task<IActionResult> DownloadPdfAsync(string fileName)
+        { 
+            var result = await this.driverDetailService.DownloadPdfAsync(fileName);
+            if(!string.IsNullOrEmpty(result.ErrorMessage))
+            {
+                return NotFound(result.ErrorMessage); 
+            }
+
+            return Ok(result);
+        }
+
+
+            [HttpGet("available-drivers")]
         public async Task<IActionResult> GetAllAvailableDrivers()
         {
             try
@@ -71,7 +107,6 @@ namespace UberTrucking.Controllers
             {
                 return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
             }
-
         }
     }
 }

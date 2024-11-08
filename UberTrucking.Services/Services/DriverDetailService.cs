@@ -1,4 +1,6 @@
-﻿using Org.BouncyCastle.Asn1.Crmf;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Org.BouncyCastle.Asn1.Crmf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,12 @@ namespace UberTrucking.Services.Services
     public class DriverDetailService : IDriverDetailService
     {
         private readonly IDriverDetailRepository driverDetailRepository;
+        private readonly IConfiguration config;
 
-        public DriverDetailService(IDriverDetailRepository driverDetailRepository)
+        public DriverDetailService(IDriverDetailRepository driverDetailRepository, IConfiguration config)
         {
             this.driverDetailRepository = driverDetailRepository;
+            this.config = config;
         }
 
         public async Task<DriverDetailResponse> CreateDriverDetailAsync(DriverDetailRequest driverDetailRequest)
@@ -73,6 +77,77 @@ namespace UberTrucking.Services.Services
             }
 
             return response;
+        }
+
+        public async Task<FileUploadResponse> UploadPdfDocumentAsync(IFormFile file)
+        {
+            var response = new FileUploadResponse();
+            var uploadDirectory = this.config["FileUpload:UploadDirectory"];
+
+            if(!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                response.ErrorMessage = "Only PDF files are allowed!";
+                return response;
+            }
+
+            if (!Directory.Exists(uploadDirectory))
+            {
+                Directory.CreateDirectory(uploadDirectory);
+            }
+
+            string uniqueFileName = $"{Guid.NewGuid().ToString().Substring(0, 4)}_{Path.GetFileName(file.FileName)}";
+            string filePath = Path.Combine(uploadDirectory, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            response.Message = "File uploaded successfully";
+
+            return response;
+        }
+
+        public async Task<FileUploadResponse> DownloadPdfAsync(string fileName)
+        {
+            var response = new FileUploadResponse();
+            try
+            {
+                response = new FileUploadResponse();
+                var uploadDirectory = this.config["FileUpload:UploadDirectory"];
+
+                if (!fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileName += ".pdf";
+                }
+
+                string filePath = Path.Combine(uploadDirectory, fileName);
+
+                if (!System.IO.File.Exists(filePath))
+                {
+                    response.ErrorMessage = $"File {fileName} not found";
+                }
+
+                var fileBytes = System.IO.File.ReadAllBytes(filePath);
+                string originalFileName = fileName.Substring(fileName.IndexOf('_') + 1);
+
+                response.DownloadedFile = new FileDto
+                {
+                    FileName = originalFileName,
+                    ContentType = "application/pdf",
+                    Content = fileBytes
+                };
+
+                response.Message = "File downloaded successfully";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.ErrorMessage = $"Error downloading file: {ex.Message}";
+                return response;
+            }
+            
+
         }
     }
 

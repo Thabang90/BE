@@ -11,14 +11,14 @@ using System.Net;
 var builder = WebApplication.CreateBuilder(args);
 
 //for testing realtime with signal R
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Listen(IPAddress.Any, 5000);
-    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
-    {
-        listenOptions.UseHttps();
-    });
-});
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.Listen(IPAddress.Any, 5000);
+//    serverOptions.Listen(IPAddress.Any, 5001, listenOptions =>
+//    {
+//        listenOptions.UseHttps();
+//    });
+//});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -30,16 +30,29 @@ builder.Services.AddScoped<IDapperSqlHelper>(sp =>
     var connectionString = configuration["SqlServerConn"];
     return new DapperSqlHelper(connectionString);
 });
+
+//builder.Services.AddCors(option =>
+//{
+//    option.AddPolicy("AllowAll", builder =>
+//    {
+//        builder.SetIsOriginAllowed(_ => true)
+//               .AllowAnyHeader()
+//               .AllowAnyMethod()
+//               .AllowCredentials();
+//    });
+//});
+
 builder.Services.AddCors(option =>
 {
-    option.AddPolicy("AllowAll", builder =>
+    option.AddPolicy("AllowLocalhost", builder =>
     {
-        builder.SetIsOriginAllowed(_ => true)
+        builder.WithOrigins("http://localhost:4200", "http://localhost:8081", "exp://192.168.1.110:8081") // Angular app URL during development
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
     });
 });
+
 builder.Services.AddSignalR();
 
 
@@ -63,7 +76,7 @@ var app = builder.Build();
 
 
 // Add SignalR endpoint
-app.UseCors("AllowAll");
+app.UseCors("AllowLocalhost");
 app.MapHub<ChatHub>("/chatHub");
 
 // Configure the HTTP request pipeline.
