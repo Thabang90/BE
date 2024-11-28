@@ -21,15 +21,23 @@ namespace UberTrucking.Infrastructure.Repositories
 
         #region Queries
         private readonly string getDriverDetailsQuery =
-                @"SELECT u.name AS DriverName, u.surname AS DriverSurname, 
+                @"SELECT u.name AS DriverName, u.surname AS DriverSurname, u.email AS DriverEmail, u.phone_number AS DriverPhone, 
                          d.driver_id as DriverId,d.vehicle_registration AS VehicleRegistration, d.vehicle_make AS VehicleMake, 
                          d.vehicle_model AS VehicleModel, d.is_available AS IsAvailable
                   FROM driver_details d WITH(NOLOCK)
                   JOIN users u WITH(NOLOCK) ON u.id = d.driver_id
                   WHERE d.driver_id = @driver_id";
 
+        private readonly string getAllDriversQuery =
+            @"SELECT u.name AS DriverName, u.surname AS DriverSurname, u.email AS DriverEmail, u.phone_number AS DriverPhone, 
+                         d.driver_id as DriverId,d.vehicle_registration AS VehicleRegistration, d.vehicle_make AS VehicleMake, 
+                         d.vehicle_model AS VehicleModel, d.is_available AS IsAvailable, activated_status AS ActivatedStatus
+                  FROM driver_details d WITH(NOLOCK)
+                  JOIN users u WITH(NOLOCK) ON u.id = d.driver_id";
+
         private readonly string createDriverDetailQuery =
-                @"INSERT INTO driver_details VALUES (@driver_id, @vehicle_registration, @vehicle_make, @vehicle_model, @is_available)";
+                @"INSERT INTO driver_details (driver_id, vehicle_registration, vehicle_make, vehicle_model, is_available)
+                  VALUES (@driver_id, @vehicle_registration, @vehicle_make, @vehicle_model, @is_available);";
 
         private readonly string updateStatusQuery =
                 @"UPDATE driver_details
@@ -48,6 +56,16 @@ namespace UberTrucking.Infrastructure.Repositories
                 @"SELECT activated_status FROM driver_details d WITH(NOLOCK) 
                   WHERE d.driver_id = @driver_id";
 
+
+        private readonly string activateDriverQuery =
+            @"UPDATE driver_details
+              SET activated_status = 1
+              WHERE driver_id = @driver_id";
+
+        private readonly string deactivateDriverQuery =
+           @"UPDATE driver_details
+              SET activated_status = 0
+              WHERE driver_id = @driver_id";
         #endregion
 
         public async Task<DriverDetail> GetDriverDetailsAsync(int driverId)
@@ -64,6 +82,12 @@ namespace UberTrucking.Infrastructure.Repositories
             {
                 throw new Exception(ex.ToString());
             }
+        }
+
+        public async Task<List<DriverDetail>> GetAllDriversAsync()
+        {
+            var results = await this.dapperSqlHelper.QueryAsync<DriverDetail>(this.getAllDriversQuery);
+            return results.ToList();
         }
 
         public async Task CreateDriverDetailAsync(DriverDetail driverDetail)
@@ -128,6 +152,22 @@ namespace UberTrucking.Infrastructure.Repositories
             {
                 throw new Exception(ex.ToString());
             }
+        }
+
+        public async Task ActivateDriverAsync(int driverId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@driver_id", driverId);
+
+            await this.dapperSqlHelper.ExecuteAsync(this.activateDriverQuery, parameters);
+        }
+
+        public async Task DeactivateDriverAsync(int driverId)
+        {
+            var parameters = new DynamicParameters();
+            parameters.Add("@driver_id", driverId);
+
+            await this.dapperSqlHelper.ExecuteAsync(this.deactivateDriverQuery, parameters);
         }
     }
 }

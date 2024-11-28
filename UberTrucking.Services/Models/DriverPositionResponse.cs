@@ -7,11 +7,9 @@ using UberTrucking.Infrastructure.Entities;
 
 namespace UberTrucking.Services.Models
 {
-    public class UserResponse
+    public class DriverPositionResponse
     {
-        public int Id { get; set; }
-        public User User { get; set; }
-
+        public DriverPosition  DriverPosition { get; set; }
         public string Message { get; set; }
         public string ErrorMessage { get; set; }
     }

@@ -12,10 +12,15 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
         Task<DriverDetail> GetDriverDetailsAsync(int driverId);
         Task CreateDriverDetailAsync(DriverDetail driverDetail);
 
+        Task<List<DriverDetail>> GetAllDriversAsync();
+
         Task UpdateDriverStatusAsync(int driverId, bool isAvailable);
 
         Task<List<DriverDetail>> GetAvailableDriversAsync();
 
         Task<bool> VerifyDriverActivatedStatusAsync(int driverId);
+
+        Task ActivateDriverAsync(int driverId);
+        Task DeactivateDriverAsync(int driverId);
     }
 }

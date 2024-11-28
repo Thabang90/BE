@@ -26,7 +26,7 @@ namespace UberTrucking.Controllers
                     return BadRequest(results.ErrorMessage);
                 }
 
-                return Ok(results.Message);
+                return Ok(results);
             }
             catch (Exception ex)
             {

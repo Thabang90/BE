@@ -43,7 +43,7 @@ namespace UberTrucking.Services.Services
                     Role_Id = request.RoleId
                 };
 
-                await this.userRepository.CreateUserAsync(user);
+                userResponse.Id = await this.userRepository.CreateUserAsync(user);
 
                 userResponse.Message = "User has been successfully created!";
             }

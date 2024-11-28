@@ -9,6 +9,8 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
 {
     public interface IDriverPositionRepository
     {
-        Task AddDriverPositionAsync(DriverPosition driverPosition); 
+        Task AddDriverPositionAsync(DriverPosition driverPosition);
+        Task<DriverPosition> GetDriverPositionAsync(int driverId);
+        Task UpdateDriverPositionAsync(DriverPosition driverPosition);
     }
 }

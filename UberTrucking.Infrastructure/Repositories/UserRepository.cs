@@ -15,7 +15,12 @@ namespace UberTrucking.Infrastructure.Repositories
         private readonly IDapperSqlHelper dapperSqlHelper;
 
         #region Queries
-        private readonly string createUserQuery = "insert into users values (@name,@surname,@email,@phone_number,@role_id,@password)";
+        private readonly string createUserQuery = 
+            @"insert into users (name, surname, email, phone_number, role_id, password)
+            OUTPUT
+            	INSERTED.id AS Id
+            values (@name,@surname,@email,@phone_number,@role_id,@password)";
+
         private readonly string getUserByEmailQuery = "select * from users with(nolock) where email = @email";
         #endregion
 
@@ -24,7 +29,7 @@ namespace UberTrucking.Infrastructure.Repositories
             this.dapperSqlHelper = dapperSqlHelper;
         }
 
-        public async Task CreateUserAsync(User user)
+        public async Task<int> CreateUserAsync(User user)
         {
             try
             {
@@ -36,7 +41,8 @@ namespace UberTrucking.Infrastructure.Repositories
                 parameters.Add("@password", user.Password);
                 parameters.Add("@role_id", user.Role_Id);
 
-                var result = await this.dapperSqlHelper.ExecuteAsync(createUserQuery, parameters);
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<int>(createUserQuery, parameters);
+                return result;
             }
             catch (Exception ex)
             {

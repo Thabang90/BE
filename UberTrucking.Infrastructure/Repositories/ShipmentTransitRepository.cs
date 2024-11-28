@@ -62,10 +62,15 @@ namespace UberTrucking.Infrastructure.Repositories
 
         private readonly string verifyShipmentDriverQuery =
             @"SELECT 
-                CASE WHEN driver_id IS NULL THEN 0
-                ELSE 1 END
-            FROM shipment_transits
-            WHERE id = @id";
+                s.id AS Id, pickup_address AS PickupAddress ,pickup_latitude AS PickupLatitude, 
+				pickup_longitude AS PickupLongitude, delivery_address AS DeliveryAddress, 
+				delivery_latitude AS DeliveryLatitude, delivery_longitude AS DeliveryLongitude,
+				address_data AS AddressData, user_id AS UserId, height AS Height, width AS Width, 
+				length AS Length, description AS Description, 
+				driver_id AS DriverId, st.price as Price, st.distance AS Distance, st.payment_method AS PaymentMethod, user_acceptance_cost AS UserAccepted
+              FROM shipment_transits s
+			  LEFT JOIN shipment_transactions st ON st.shipment_id = s.id
+              WHERE s.id = @id";
 
         private readonly string updateShipmentTransactionUserAcceptanceCost =
             @"UPDATE shipment_transactions
@@ -79,6 +84,17 @@ namespace UberTrucking.Infrastructure.Repositories
               	INSERTED.user_acceptance_cost AS UserAcceptanceCost
               WHERE shipment_id = @id";
 
+        private readonly string userShipmentTransitsQuery =
+            @"SELECT st.id AS Id, st.pickup_address AS PickupAddress ,st.pickup_latitude AS PickupLatitude, 
+                     st.pickup_longitude AS PickupLongitude, st.delivery_address AS DeliveryAddress, 
+                     st.delivery_latitude AS DeliveryLatitude, st.delivery_longitude AS DeliveryLongitude,
+                     st.address_data AS AddressData, st.user_id AS UserId, st.height AS Height, st.width AS Width, 
+                     st.length AS Length, st.description AS Description, sts.price AS Price, 
+					 u.name AS DriverName, u.surname AS DriverSurname
+              FROM shipment_transits st
+			  LEFT JOIN shipment_transactions sts ON sts.shipment_id = st.id
+			  LEFT JOIN users u ON u.id = st.driver_id 
+              WHERE user_id = @user_id";
         #endregion
 
         public ShipmentTransitRepository(IDapperSqlHelper dapperSqlHelper)
@@ -153,14 +169,14 @@ namespace UberTrucking.Infrastructure.Repositories
             return result;
         }
 
-        public async Task<bool> ShipmentHasDriverAsync(int shipmentId)
+        public async Task<ShipmentTransit> ShipmentHasDriverAsync(int shipmentId)
         {
             try
             {
                 var parameters = new DynamicParameters();
                 parameters.Add("@id", shipmentId);
 
-                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<bool>(this.verifyShipmentDriverQuery, parameters);
+                var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<ShipmentTransit>(this.verifyShipmentDriverQuery, parameters);
                 return result;
             }
             catch (Exception ex)
@@ -178,6 +194,23 @@ namespace UberTrucking.Infrastructure.Repositories
 
                 var result = await this.dapperSqlHelper.QueryFirstOrDefaultAsync<ShipmentTransaction>(this.updateShipmentTransactionUserAcceptanceCost, parameters);
                 return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        public async Task<IEnumerable<ShipmentTransit>> GetShipmentsByUserIdAsync(int userId)
+        {
+            try
+            {
+                var parameters = new DynamicParameters();
+                parameters.Add("@user_id", userId);
+
+                var result = await this.dapperSqlHelper.QueryAsync<ShipmentTransit>(this.userShipmentTransitsQuery, parameters);
+                return result;
+
             }
             catch (Exception ex)
             {

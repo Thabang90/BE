@@ -9,7 +9,7 @@ namespace UberTrucking.Infrastructure.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-        Task CreateUserAsync(User user);
+        Task<int> CreateUserAsync(User user);
 
         Task<User> RetrieveUserByEmailAsync(string email);
     }

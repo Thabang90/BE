@@ -11,6 +11,8 @@ namespace UberTrucking.Infrastructure.Entities
         public int DriverId { get; set; }
         public string DriverName { get; set; }
         public string DriverSurname { get; set; }
+        public string DriverEmail { get; set; }
+        public string DriverPhone { get; set; }
         public string VehicleRegistration { get; set; }    
         public string VehicleMake { get; set; }
         public string VehicleModel { get; set; }

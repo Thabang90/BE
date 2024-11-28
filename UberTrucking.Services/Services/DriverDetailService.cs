@@ -17,12 +17,14 @@ namespace UberTrucking.Services.Services
     public class DriverDetailService : IDriverDetailService
     {
         private readonly IDriverDetailRepository driverDetailRepository;
+        private readonly IDriverPositionRepository driverPositionRepository;
         private readonly IConfiguration config;
 
-        public DriverDetailService(IDriverDetailRepository driverDetailRepository, IConfiguration config)
+        public DriverDetailService(IDriverDetailRepository driverDetailRepository, IConfiguration config, IDriverPositionRepository driverPositionRepository)
         {
             this.driverDetailRepository = driverDetailRepository;
             this.config = config;
+            this.driverPositionRepository = driverPositionRepository;
         }
 
         public async Task<DriverDetailResponse> CreateDriverDetailAsync(DriverDetailRequest driverDetailRequest)
@@ -79,12 +81,29 @@ namespace UberTrucking.Services.Services
             return response;
         }
 
-        public async Task<FileUploadResponse> UploadPdfDocumentAsync(IFormFile file)
+        public async Task<DriverDetailResponse> GetAllDriversAsync()
+        {
+            var response = new DriverDetailResponse();
+            var result = await this.driverDetailRepository.GetAllDriversAsync();
+
+            if (result.Count() > 0)
+            {
+                response.DriverDetails = result;
+            }
+            else
+            {
+                response.ErrorMessage = "There are no drivers created on the system!";
+            }
+
+            return response;
+        }
+
+        public async Task<FileUploadResponse> UploadPdfDocumentAsync(FileUploadRequest request)
         {
             var response = new FileUploadResponse();
-            var uploadDirectory = this.config["FileUpload:UploadDirectory"];
+            var uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
 
-            if(!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+            if (!request.File.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
             {
                 response.ErrorMessage = "Only PDF files are allowed!";
                 return response;
@@ -95,12 +114,11 @@ namespace UberTrucking.Services.Services
                 Directory.CreateDirectory(uploadDirectory);
             }
 
-            string uniqueFileName = $"{Guid.NewGuid().ToString().Substring(0, 4)}_{Path.GetFileName(file.FileName)}";
-            string filePath = Path.Combine(uploadDirectory, uniqueFileName);
+            string filePath = Path.Combine(uploadDirectory, request.DriverId + ".pdf");
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await file.CopyToAsync(stream);
+                await request.File.CopyToAsync(stream);
             }
 
             response.Message = "File uploaded successfully";
@@ -114,7 +132,13 @@ namespace UberTrucking.Services.Services
             try
             {
                 response = new FileUploadResponse();
-                var uploadDirectory = this.config["FileUpload:UploadDirectory"];
+                var uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+
+                if (!Directory.Exists(uploadDirectory))
+                {
+                    response.ErrorMessage = "Directory Not Found!!!";
+                    return response;
+                }
 
                 if (!fileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
                 {
@@ -125,11 +149,12 @@ namespace UberTrucking.Services.Services
 
                 if (!System.IO.File.Exists(filePath))
                 {
-                    response.ErrorMessage = $"File {fileName} not found";
+                    response.ErrorMessage = "No file was found. Please contact driver";
+                    return response;
                 }
 
                 var fileBytes = System.IO.File.ReadAllBytes(filePath);
-                string originalFileName = fileName.Substring(fileName.IndexOf('_') + 1);
+                string originalFileName = fileName;
 
                 response.DownloadedFile = new FileDto
                 {
@@ -146,9 +171,61 @@ namespace UberTrucking.Services.Services
                 response.ErrorMessage = $"Error downloading file: {ex.Message}";
                 return response;
             }
-            
+        }
 
+        public async Task ActivateDriverByIdAsync(int driverId)
+        {
+            await this.driverDetailRepository.ActivateDriverAsync(driverId);
+        }
+
+        public async Task DeactivateDriverByIdAsync(int driverId)
+        {
+            await this.driverDetailRepository.DeactivateDriverAsync(driverId);
+        }
+
+        public async Task<DriverPositionResponse> UpsertDriverPositionAsync(DriverPositionRequest driverPositionRequest)
+        {
+            var response = new DriverPositionResponse();
+            var driverPosition = new DriverPosition()
+            {
+                DriverId = driverPositionRequest.DriverId,
+                Latitude = driverPositionRequest.Latitude,
+                Longitude = driverPositionRequest.Longitude,
+                ShipmentId = driverPositionRequest.ShipmentId,
+                Waypoint = driverPositionRequest.Waypoint
+            };
+
+            var driverPos = await this.driverPositionRepository.GetDriverPositionAsync(driverPosition.DriverId);
+            if (driverPos == null)
+            {
+                await this.driverPositionRepository.AddDriverPositionAsync(driverPosition);
+                response.Message = "Driver Successfully created!";
+            }
+            else
+            {
+                await this.driverPositionRepository.UpdateDriverPositionAsync(driverPosition);
+                response.Message = "Driver Successfully Updated!";
+            }
+
+            return response;
+        }
+
+        public async Task<DriverPositionResponse> GetDriverPositionAsync(int driverId)
+        {
+            var response = new DriverPositionResponse();
+            var result = await this.driverPositionRepository.GetDriverPositionAsync(driverId);
+
+            if(result == null)
+            {
+                response.ErrorMessage = "No positions found for driver";
+            }
+            else
+            {
+                response.Message = "Driver position found";
+                response.DriverPosition = result;
+            }
+
+            return response;
         }
     }
-
 }

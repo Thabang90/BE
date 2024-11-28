@@ -89,6 +89,10 @@ namespace UberTrucking.Controllers
             try
             {
                 var result = await this.shipmentTransitService.ShipmentHasDriverAsync(id);
+                if (!string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    return NotFound(result.ErrorMessage);
+                }
                 return Ok(result);
             }
             catch (Exception ex)
@@ -106,6 +110,24 @@ namespace UberTrucking.Controllers
                 if (!string.IsNullOrEmpty(result.ErrorMessage))
                 {
                     return BadRequest(result.ErrorMessage);
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while processing your request.", Details = ex.Message });
+            }
+        }
+
+        [HttpGet("user-shipments/{userId}")]
+        public async Task<IActionResult> GetUserShipmentsAsync(int userId)
+        {
+            try
+            {
+                var result = await this.shipmentTransitService.GetUserShipmentTransitsAsync(userId);
+                if (!string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    return NotFound(result.ErrorMessage);
                 }
                 return Ok(result);
             }

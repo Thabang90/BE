@@ -22,6 +22,12 @@ namespace UberTrucking.Infrastructure.Entities
         public decimal Width { get; set; }
         public decimal Length { get; set; }
         public string Description { get; set; }
-        public int DriverId { get; set; }
+        public int? DriverId { get; set; }
+        public decimal Price { get; set; }
+        public decimal Distance { get; set; }
+        public string PaymentMethod { get; set; }
+        public bool UserAcceptedIsActive { get; set; }
+        public string DriverName { get; set; }
+        public string DriverSurname { get; set; }
     }
 }

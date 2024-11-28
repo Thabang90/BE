@@ -61,7 +61,7 @@ namespace UberTrucking.Services.Services
 
         public async Task UpdateShipmentDriverAsync(UpdateShipmentDriverRequest request)
         {
-            await this.shipmentTransitRepository.UpdateShipmentDriverAsync(request.ShipmentId, request.ShipmentId);
+            await this.shipmentTransitRepository.UpdateShipmentDriverAsync(request.ShipmentId, request.DriverId);
         }
 
         public async Task<ShipmentTransitResponse> GetAvailableShipmentsAsync(int driverId)
@@ -87,10 +87,22 @@ namespace UberTrucking.Services.Services
             return response;
         }
 
-        public async Task<bool> ShipmentHasDriverAsync(int shipmentId)
+        public async Task<ShipmentWithDriverResponse> ShipmentHasDriverAsync(int shipmentId)
         {
+            var response = new ShipmentWithDriverResponse();
             var result = await this.shipmentTransitRepository.ShipmentHasDriverAsync(shipmentId);
-            return result;
+
+            if(result == null)
+            {
+                response.ErrorMessage = "Shipment was not found, please verify and try again!";
+            }
+            else
+            {
+                response.ShipmentTransit = result;
+                response.HasDriver = result.DriverId != null;
+            }
+
+            return response;
         }
 
         public async Task<ShipmentTransactionResponse> UpdateShipmentTransactionUserAcceptanceCostAsync(int shipmentId)
@@ -103,6 +115,24 @@ namespace UberTrucking.Services.Services
             }
 
             response.ShipmentTransaction = result;
+            return response;
+        }
+
+        public async Task<ShipmentTransitResponse> GetUserShipmentTransitsAsync(int userId)
+        {
+            var response = new ShipmentTransitResponse();
+
+            var result = await this.shipmentTransitRepository.GetShipmentsByUserIdAsync(userId);
+
+            if(result == null || result.Count() < 1)
+            {
+                response.ErrorMessage = "User has not created shipments yet!";
+            }
+            else
+            {
+                response.ShipmentTransits = result;
+            }
+
             return response;
         }
     }
